@@ -1,6 +1,0 @@
-module CQtWrapper [system] {
-    header "qt_c_wrapper.h"
-    export *
-    link "Qt6Core"
-    link "Qt6Widgets"
-}

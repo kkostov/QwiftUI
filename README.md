@@ -4,7 +4,6 @@ This is an experiment to create a Swift UI library based on Qt6. As research, th
 
 The end-game, is to provide for a complete implementation of a SwiftCrossUI's AppBackend https://github.com/stackotter/swift-cross-ui/blob/main/Sources/SwiftCrossUI/Backend/AppBackend.swift
 
-
 Some constraints I set for this experiment:
 
 - No additional tooling or build systems - let's try to use only swift features.
@@ -16,13 +15,19 @@ Currently it builds on macOS and Linux, but the goal is to focus more on Linux a
 
 - QwiftUI - the library we intend to build
 - QtHelloSwift - simple todo app to run experiments, this will be refactored to depend on QwiftUI.
-- CQtWrapper - a target wrapping Qt6 APIs and making them available to QwiftUI
+-
+
+## Hello world
+
+A todo app of course.
+
+https://github.com/user-attachments/assets/25a5fd45-2a41-4711-a6e4-37b4d0868438
 
 ## Setup
 
 This is hardcoded for now:
 
-The Package.swift is configured to expect the qt6 headers in a location used by Homebrew (brew install qt): `opt/homebrew/Cellar/qt/6.9.0` for macOS
+The Package.swift is configured to expect the qt6 headers in a location used by Homebrew (brew install qt): `opt/homebrew/Cellar/qt/6.9.1` for macOS
 
 On Linux, the path is set to `/usr/include/qt6` which is the default on Fedora.
 

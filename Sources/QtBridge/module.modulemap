@@ -1,0 +1,5 @@
+module QtBridge {
+    header "include/QtBridge.h"
+    requires cplusplus
+    export *
+}
