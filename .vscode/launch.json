@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:QwiftUI}",
+      "name": "Debug QtHelloSwift",
+      "program": "${workspaceFolder:QwiftUI}/.build/debug/QtHelloSwift",
+      "preLaunchTask": "swift: Build Debug QtHelloSwift"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:QwiftUI}",
+      "name": "Release QtHelloSwift",
+      "program": "${workspaceFolder:QwiftUI}/.build/release/QtHelloSwift",
+      "preLaunchTask": "swift: Build Release QtHelloSwift"
+    }
+  ]
+}
