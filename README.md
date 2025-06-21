@@ -15,8 +15,15 @@ Currently it builds on macOS and Linux, but the goal is to focus more on Linux a
 ## Targets
 
 - QwiftUI - the library we intend to build
-- QtHelloSwift - simple todo app to run experiments, this will be refactored to depend on QwiftUI.
 - CQtWrapper - a target wrapping Qt6 APIs and making them available to QwiftUI
+- QtHelloSwift - simple todo app to run experiments, this will be refactored to depend on QwiftUI.
+- 
+## Hello world
+
+A todo app of course.
+
+https://github.com/user-attachments/assets/25a5fd45-2a41-4711-a6e4-37b4d0868438
+
 
 ## Setup
 
