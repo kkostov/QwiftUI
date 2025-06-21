@@ -19,3 +19,7 @@ This is hardcoded for now:
 The Package.swift is configured to expect the qt6 headers in a location used by Homebrew (brew install qt): `opt/homebrew/Cellar/qt/6.9.0` for macOS
 
 On Linux, the path is set to `/usr/include/qt6` which is the default on Fedora.
+
+## License
+
+This project is licensed under the BSD 3-Clause License. See the [LICENSE](LICENSE) file for details.
