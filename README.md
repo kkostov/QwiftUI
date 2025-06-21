@@ -12,6 +12,12 @@ Some constraints I set for this experiment:
 
 Currently it builds on macOS and Linux, but the goal is to focus more on Linux and Windows as target platforms where SwiftUI/AppKit are not available.
 
+## Targets
+
+- QwiftUI - the library we intend to build
+- QtHelloSwift - simple todo app to run experiments, this will be refactored to depend on QwiftUI.
+- CQtWrapper - a target wrapping Qt6 APIs and making them available to QwiftUI
+
 ## Setup
 
 This is hardcoded for now:
