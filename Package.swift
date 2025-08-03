@@ -7,22 +7,27 @@ let package = Package(
     platforms: [
         .macOS(.v15)
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/stackotter/swift-cross-ui", branch: "main")
+    ],
     targets: [
         .target(
             name: "QtBridge",
-            sources: ["QtBridge.cpp"],
+            sources: [
+                "QtBridge.cpp",
+                "QtTestBridge.cpp",
+            ],
             publicHeadersPath: "include",
             cxxSettings: [
-                .define("QT_NO_KEYWORDS"),
                 .unsafeFlags([
                     "-std=c++17",
                     "-I/opt/homebrew/Cellar/qt/6.9.1/include",
                     "-I/opt/homebrew/Cellar/qt/6.9.1/include/QtCore",
                     "-I/opt/homebrew/Cellar/qt/6.9.1/include/QtWidgets",
                     "-I/opt/homebrew/Cellar/qt/6.9.1/include/QtGui",
+                    "-I/opt/homebrew/Cellar/qt/6.9.1/include/QtTest",
                     "-F/opt/homebrew/Cellar/qt/6.9.1/lib",
-                ]),
+                ])
             ],
             swiftSettings: [
                 .interoperabilityMode(.Cxx),
@@ -34,6 +39,7 @@ let package = Package(
                     "-framework", "QtCore",
                     "-framework", "QtWidgets",
                     "-framework", "QtGui",
+                    "-framework", "QtTest",
                 ])
             ]
         ),
@@ -53,10 +59,46 @@ let package = Package(
                 .interoperabilityMode(.Cxx)
             ]
         ),
+        .target(
+            name: "QwiftUITesting",  // Testing framework for QwiftUI
+            dependencies: [
+                "QtBridge",
+                "QwiftUI",
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx),
+                .defaultIsolation(MainActor.self),
+            ],
+            linkerSettings: [
+                .unsafeFlags([
+                    "-F/opt/homebrew/Cellar/qt/6.9.1/lib",
+                    "-framework", "QtTest",  // Link Qt Test framework
+                ])
+            ]
+        ),
+        .target(
+            name: "Qt6AppBackend",  // SwiftCrossUI backend implementation using QwiftUI
+            dependencies: [
+                "QwiftUI",
+                .product(name: "SwiftCrossUI", package: "swift-cross-ui"),
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx),
+                // Removed defaultIsolation to avoid Swift 6 concurrency conflicts
+                // Using minimal concurrency checking for SwiftCrossUI compatibility
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=minimal"]),
+            ]
+        ),
+        .executableTarget(
+            name: "Qt6AppBackendDemo",
+            dependencies: [
+                "Qt6AppBackend",
+                .product(name: "SwiftCrossUI", package: "swift-cross-ui"),
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx),
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=minimal"]),
+            ]
+        ),
     ]
 )
-
-// Ensure QtWidgets and QtCore are included for QLineEdit/QCheckBox
-// Ensure new widget/container management header is included
-// (Already included via publicHeadersPath: "include")
-// No further changes needed unless new header files are created.

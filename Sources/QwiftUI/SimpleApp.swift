@@ -8,14 +8,8 @@ public final class SimpleApp {
     
     /// Initialize with command line arguments automatically
     public init() {
-        // Build arguments from command line
-        var builder = ArgumentsBuilder()
-        for arg in CommandLine.arguments {
-            builder.addArg(std.string(arg))
-        }
-        
-        // Create fully initialized Qt application
-        app = SwiftQApplication(builder)
+        // SwiftQApplication now handles arguments internally
+        app = SwiftQApplication()
     }
     
     /// Run the application

@@ -27,35 +27,33 @@ import QtBridge
 /// label.alignment = [.top, .right]  // Top-right corner
 /// ```
 ///
-/// A view that displays text.
-///
-/// Labels are non-editable text views that display information to users.
-/// You can control the text alignment and update the text dynamically.
-///
-/// Note: This class does not inherit from Widget due to Swift/C++ interop
-/// limitations with inheritance. It provides its own widget-like interface.
-///
-public class Label {
-    /// The underlying Qt label pointer
-    private let labelPtr: UnsafeMutablePointer<SwiftQLabel>
+@MainActor
+public class Label: QtWidget {
+    /// The underlying Qt label stored as a pointer
+    /// Marked as nonisolated(unsafe) since pointer operations are inherently unsafe
+    nonisolated(unsafe) internal var qtLabel: UnsafeMutablePointer<SwiftQLabel>
+    
+    /// Protocol conformance - provide mutable pointer
+    /// Note: This returns a pointer to the base SwiftQWidget part of SwiftQLabel
+    public func getBridgeWidget() -> UnsafeMutablePointer<SwiftQWidget> {
+        // Cast from SwiftQLabel* to SwiftQWidget* (base class pointer)
+        return UnsafeMutableRawPointer(qtLabel).assumingMemoryBound(to: SwiftQWidget.self)
+    }
     
     /// The text displayed by the label
     public var text: String {
         get {
-            // For now, return stored value as we can't query Qt
-            return _text
+            return String(qtLabel.pointee.text())
         }
         set {
-            _text = newValue
-            updateText()
+            qtLabel.pointee.setText(std.string(newValue))
         }
     }
-    private var _text: String = ""
     
     /// The alignment of the text within the label
-    public var alignment: Alignment = .default {
+    public var alignment: Qt.Alignment = [] {
         didSet {
-            updateAlignment()
+            qtLabel.pointee.setAlignment(Int32(alignment.rawValue))
         }
     }
     
@@ -64,24 +62,16 @@ public class Label {
     /// - Parameters:
     ///   - text: The text to display in the label
     ///   - parent: The parent widget, if any
-    public init(_ text: String = "", parent: Widget? = nil) {
-        self._text = text
+    public init(_ text: String = "", parent: (any QtWidget)? = nil) {
+        // Allocate the C++ object on the heap
+        qtLabel = UnsafeMutablePointer<SwiftQLabel>.allocate(capacity: 1)
         
-        // Create a Qt label using the factory function
-        if let parentWidget = parent {
-            guard let ptr = createLabel(std.string(text), &parentWidget.qtWidget) else {
-                fatalError("Failed to create label")
-            }
-            self.labelPtr = ptr
+        // Initialize the C++ object
+        if let parent = parent {
+            qtLabel.initialize(to: SwiftQLabel(std.string(text), parent.getBridgeWidget()))
         } else {
-            guard let ptr = createLabel(std.string(text), nil) else {
-                fatalError("Failed to create label")
-            }
-            self.labelPtr = ptr
+            qtLabel.initialize(to: SwiftQLabel(std.string(text)))
         }
-        
-        // Set initial alignment
-        updateAlignment()
     }
     
     /// Creates a label that displays the string representation of a value.
@@ -89,79 +79,80 @@ public class Label {
     /// - Parameters:
     ///   - value: A value whose string representation will be displayed
     ///   - parent: The parent widget, if any
-    public init<T>(_ value: T, parent: Widget? = nil) {
-        self._text = String(describing: value)
+    public init<T>(_ value: T, parent: (any QtWidget)? = nil) {
+        let text = String(describing: value)
         
-        // Create a Qt label using the factory function
-        if let parentWidget = parent {
-            guard let ptr = createLabel(std.string(_text), &parentWidget.qtWidget) else {
-                fatalError("Failed to create label")
-            }
-            self.labelPtr = ptr
+        // Allocate the C++ object on the heap
+        qtLabel = UnsafeMutablePointer<SwiftQLabel>.allocate(capacity: 1)
+        
+        // Initialize the C++ object
+        if let parent = parent {
+            qtLabel.initialize(to: SwiftQLabel(std.string(text), parent.getBridgeWidget()))
         } else {
-            guard let ptr = createLabel(std.string(_text), nil) else {
-                fatalError("Failed to create label")
-            }
-            self.labelPtr = ptr
+            qtLabel.initialize(to: SwiftQLabel(std.string(text)))
         }
-        
-        // Set initial alignment
-        updateAlignment()
     }
     
-    private func updateText() {
-        labelPtr.pointee.setText(std.string(_text))
+    deinit {
+        // Since Label is MainActor-isolated, we can safely access qtLabel
+        // The pointer deallocation is safe from deinit
+        let ptr = qtLabel
+        ptr.deinitialize(count: 1)
+        ptr.deallocate()
     }
     
-    private func updateAlignment() {
-        labelPtr.pointee.setAlignment(Int32(alignment.rawValue))
-    }
-}
-
-// MARK: - Widget-like Interface
-
-public extension Label {
-    /// Shows the label.
-    func show() {
-        labelPtr.pointee.show()
+    // MARK: - QtWidget Protocol Implementation
+    
+    public func show() {
+        qtLabel.pointee.show()
     }
     
-    /// Hides the label.
-    func hide() {
-        labelPtr.pointee.hide()
+    public func hide() {
+        qtLabel.pointee.hide()
     }
     
-    /// Resizes the label.
-    ///
-    /// - Parameters:
-    ///   - width: The new width in pixels
-    ///   - height: The new height in pixels
-    func resize(width: Int, height: Int) {
-        labelPtr.pointee.resize(Int32(width), Int32(height))
+    public func setEnabled(_ enabled: Bool) {
+        qtLabel.pointee.setEnabled(enabled)
     }
     
-    /// Moves the label to the specified position.
-    ///
-    /// - Parameters:
-    ///   - x: The horizontal position in pixels
-    ///   - y: The vertical position in pixels  
-    func move(x: Int, y: Int) {
-        labelPtr.pointee.move(Int32(x), Int32(y))
+    public var isVisible: Bool {
+        qtLabel.pointee.isVisible()
     }
     
-    /// Sets both position and size in a single call.
-    ///
-    /// - Parameters:
-    ///   - x: The horizontal position
-    ///   - y: The vertical position
-    ///   - width: The width
-    ///   - height: The height
-    /// - Returns: Self for method chaining
-    @discardableResult
-    func frame(x: Int, y: Int, width: Int, height: Int) -> Self {
-        move(x: x, y: y)
-        resize(width: width, height: height)
-        return self
+    public func resize(width: Int, height: Int) {
+        qtLabel.pointee.resize(Int32(width), Int32(height))
+    }
+    
+    public func move(x: Int, y: Int) {
+        qtLabel.pointee.move(Int32(x), Int32(y))
+    }
+    
+    public func setGeometry(x: Int, y: Int, width: Int, height: Int) {
+        qtLabel.pointee.setGeometry(Int32(x), Int32(y), Int32(width), Int32(height))
+    }
+    
+    public func setWindowTitle(_ title: String) {
+        qtLabel.pointee.setWindowTitle(std.string(title))
+    }
+    
+    public var windowTitle: String {
+        String(qtLabel.pointee.windowTitle())
+    }
+    
+    public func setObjectName(_ name: String) {
+        qtLabel.pointee.setObjectName(std.string(name))
+    }
+    
+    public var objectName: String {
+        String(qtLabel.pointee.objectName())
+    }
+    
+    public func setParent(_ parent: QtWidget?) {
+        if let parent = parent {
+            qtLabel.pointee.setParent(parent.getBridgeWidget())
+        } else {
+            qtLabel.pointee.setParent(nil)
+        }
     }
 }
 
@@ -176,7 +167,7 @@ public extension Label {
     ///   - alignment: How to align the text
     /// - Returns: Self for method chaining
     @discardableResult
-    func configure(text: String, alignment: Alignment = .default) -> Self {
+    func configure(text: String, alignment: Qt.Alignment = []) -> Self {
         self.text = text
         self.alignment = alignment
         return self
@@ -188,9 +179,9 @@ public extension Label {
     ///   - text: The text to display
     ///   - parent: The parent widget, if any
     /// - Returns: A new label with centered text
-    static func centered(_ text: String, parent: Widget? = nil) -> Label {
+    static func centered(_ text: String, parent: (any QtWidget)? = nil) -> Label {
         let label = Label(text, parent: parent)
-        label.alignment = .center
+        label.alignment = Qt.Alignment.center
         return label
     }
 }
