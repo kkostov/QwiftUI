@@ -1,5 +1,5 @@
 {
-  "originHash" : "e16bb355eda829ed4f543942b093f98958b8e674aa6f9807100d1b1d6383e2f7",
+  "originHash" : "f5a7b262b0721ed24b248383fe00bb67d4e5e24a7123ed742522fe715e4454be",
   "pins" : [
     {
       "identity" : "jpeg",
@@ -34,7 +34,7 @@
       "location" : "https://github.com/stackotter/swift-cross-ui",
       "state" : {
         "branch" : "main",
-        "revision" : "85a321f0720e05dcc12546121c1041add0bfd5a0"
+        "revision" : "d9af7bd0ee56e2c6baf0283bdd525822f7f38e66"
       }
     },
     {
