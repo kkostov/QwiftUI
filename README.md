@@ -9,6 +9,10 @@ Some constraints I set for this experiment:
 
 Currently it builds on macOS and Linux, but the goal is to focus more on Linux and Windows as target platforms where SwiftUI/AppKit are not available.
 
+
+https://github.com/user-attachments/assets/a44f46ac-f1fb-4c79-9c0a-825117e95283
+
+
 ## Targets
 
 - `QwiftUI` - the library
