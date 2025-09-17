@@ -1,5 +1,7 @@
 # QwiftUI
 
+[Blog post](https://iamkonstantin.eu/blog/swift-62-and-qt6-interop/)
+
 This is an experiment to create a Swift UI library based on Qt6. As research, this is a tiny todo application using Swift 6.2 and Qt6 widgets made usable in a safe way (e.g. using Swift's concurrency)
 
 Some constraints I set for this experiment:
